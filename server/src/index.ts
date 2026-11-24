@@ -2,7 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 
 const app = express();
-const PORT = process.env.PORT; // reads port form .env
+const PORT = process.env.PORT || 3000; // reads port form .env
 
 app.use(express.json());
 

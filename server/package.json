@@ -12,7 +12,6 @@
     "dev": "concurrently \"tsc --watch\" \"node --watch src/index.ts\"",
     "start": "node src/index.ts",
     "lint": "eslint ."
-
   },
   "dependencies": {
     "dotenv": "^18.0.10",
@@ -20,6 +19,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@stylistic/eslint-plugin": "^6.0.1",
     "@types/express": "^5.0.6",
     "@types/node": "^26.6.6",
     "concurrently": "^10.0.7",
