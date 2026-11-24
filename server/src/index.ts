@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import pool from './db/postgres.ts';
+import { connectMongo } from './db/mongo.ts';
 
 const app = express();
 const PORT = process.env.PORT || 3000; // reads port form .env
@@ -13,6 +14,8 @@ app.get('/', (_req, res) => {
 
 const result = await pool.query<{ now: Date }>('SELECT NOW()');
 console.log('Connected to Postgres at', result.rows[0]?.now);
+
+await connectMongo();
 
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
