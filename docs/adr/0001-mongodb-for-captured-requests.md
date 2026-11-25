@@ -1,0 +1,3 @@
+# Bins in Postgres, Captured Requests in MongoDB
+
+Bins are stored in Postgres, while each Captured Request is stored as a MongoDB document whose `_id` is the app-generated, non-sequential request ID returned to the sender. A Captured Request is a self-contained record of arbitrary, sender-defined shape (headers, query, raw body), so it maps naturally to one document per request; Bins are small, structured records that fit a relational table. The cost is running and keeping consistent two databases: the link between them is the Bin ID, referenced by ID only, with no cross-database integrity enforced.
