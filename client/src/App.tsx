@@ -1,12 +1,23 @@
+import { inboxes } from './sampleInboxes';
 import './App.css';
 
 function App() {
+  const hasInboxes = inboxes.length > 0;
+
   return (
     <>
       <header className="app-header">Hookspector</header>
       <div className="dashboard-layout">
         <aside className="inbox-sidebar" aria-label="Inboxes">
-          <p>No inboxes yet</p>
+          {hasInboxes ? (
+            <ul>
+              {inboxes.map((inbox) => (
+                <li key={inbox.id}>{inbox.name}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>No inboxes yet</p>
+          )}
         </aside>
         <main className="dashboard-main">
           <header className="dashboard-header">
