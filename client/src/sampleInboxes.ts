@@ -1,6 +1,6 @@
-type Inbox = {
+export type Inbox = {
   id: string;
-  name: string;
+  name: string | null;
   url: string;
 };
 
@@ -12,7 +12,7 @@ export const inboxes: Inbox[] = [
   },
   {
     id: 'b61d40',
-    name: 'Webhook test',
+    name: null,
     url: 'https://hookspector.example/capture/b61d40',
   },
 ];

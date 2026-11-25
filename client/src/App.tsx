@@ -1,5 +1,9 @@
-import { inboxes } from './sampleInboxes';
+import { inboxes, type Inbox } from './sampleInboxes';
 import './App.css';
+
+function inboxLabel(inbox: Inbox) {
+  return inbox.name ?? `Inbox ${inbox.id.slice(0, 6)}`;
+}
 
 function App() {
   const hasInboxes = inboxes.length > 0;
@@ -12,7 +16,7 @@ function App() {
           {hasInboxes ? (
             <ul>
               {inboxes.map((inbox) => (
-                <li key={inbox.id}>{inbox.name}</li>
+                <li key={inbox.id}>{inboxLabel(inbox)}</li>
               ))}
             </ul>
           ) : (
@@ -35,7 +39,7 @@ function App() {
               <tbody>
                 {inboxes.map((inbox) => (
                   <tr key={inbox.id}>
-                    <th scope="row">{inbox.name}</th>
+                    <th scope="row">{inboxLabel(inbox)}</th>
                     <td>
                       <code>{inbox.url}</code>
                     </td>
