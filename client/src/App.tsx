@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { inboxes, type Inbox } from './sampleInboxes';
 import './App.css';
 
@@ -6,6 +7,7 @@ function inboxLabel(inbox: Inbox) {
 }
 
 function App() {
+  const createDialog = useRef<HTMLDialogElement>(null);
   const hasInboxes = inboxes.length > 0;
 
   return (
@@ -26,7 +28,9 @@ function App() {
         <main className="dashboard-main">
           <header className="dashboard-header">
             <h1>All inboxes</h1>
-            <button type="button">Create inbox</button>
+            <button type="button" onClick={() => createDialog.current?.showModal()}>
+              Create inbox
+            </button>
           </header>
           {hasInboxes ? (
             <table className="inbox-table">
@@ -52,6 +56,12 @@ function App() {
           )}
         </main>
       </div>
+      <dialog ref={createDialog} aria-labelledby="create-inbox-title">
+        <h2 id="create-inbox-title">Create inbox</h2>
+        <button type="button" onClick={() => createDialog.current?.close()}>
+          Cancel
+        </button>
+      </dialog>
     </>
   );
 }
