@@ -3,17 +3,17 @@ import './App.css';
 function App() {
   return (
     <>
-      <header>Hookspector</header>
+      <header className="app-header">Hookspector</header>
       <div className="dashboard-layout">
-        <aside aria-label="Inboxes">
+        <aside className="inbox-sidebar" aria-label="Inboxes">
           <p>No inboxes yet</p>
         </aside>
-        <main>
+        <main className="dashboard-main">
           <header className="dashboard-header">
             <h1>All inboxes</h1>
             <button type="button">Create inbox</button>
           </header>
-          <p>No inboxes yet</p>
+          <p className="dashboard-empty">No inboxes yet</p>
         </main>
       </div>
     </>
