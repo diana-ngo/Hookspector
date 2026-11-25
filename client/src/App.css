@@ -1,0 +1,10 @@
+.dashboard-layout {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
