@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { inboxes, type Inbox } from './sampleInboxes';
 import './App.css';
 
@@ -8,6 +8,8 @@ function inboxLabel(inbox: Inbox) {
 
 function App() {
   const createDialog = useRef<HTMLDialogElement>(null);
+  const [inboxName, setInboxName] = useState('');
+  const trimmedName = inboxName.trim();
   const hasInboxes = inboxes.length > 0;
 
   return (
@@ -60,12 +62,22 @@ function App() {
         <h2 id="create-inbox-title">Create inbox</h2>
         <form method="dialog">
           <label htmlFor="inbox-name">Inbox name</label>
-          <input id="inbox-name" name="name" type="text" required maxLength={100} />
+          <input
+            id="inbox-name"
+            name="name"
+            type="text"
+            required
+            maxLength={100}
+            value={inboxName}
+            onChange={(event) => setInboxName(event.currentTarget.value)}
+          />
           <div>
             <button type="button" onClick={() => createDialog.current?.close()}>
               Cancel
             </button>
-            <button type="submit">Create</button>
+            <button type="submit" disabled={trimmedName.length === 0}>
+              Create
+            </button>
           </div>
         </form>
       </dialog>
