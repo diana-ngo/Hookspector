@@ -46,7 +46,7 @@ function App() {
         <main className="dashboard-main">
           <header className="dashboard-header">
             <h1>All inboxes</h1>
-            <button type="button" onClick={openCreateDialog}>
+            <button className="primary-button" type="button" onClick={openCreateDialog}>
               Create inbox
             </button>
           </header>
@@ -74,7 +74,11 @@ function App() {
           )}
         </main>
       </div>
-      <dialog ref={createDialog} aria-labelledby="create-inbox-title">
+      <dialog
+        ref={createDialog}
+        className="create-inbox-dialog"
+        aria-labelledby="create-inbox-title"
+      >
         <h2 id="create-inbox-title">Create inbox</h2>
         <form method="dialog" onSubmit={submitCreateInbox}>
           <label htmlFor="inbox-name">Inbox name</label>
@@ -87,11 +91,15 @@ function App() {
             value={inboxName}
             onChange={(event) => setInboxName(event.currentTarget.value)}
           />
-          <div>
-            <button type="button" onClick={() => createDialog.current?.close()}>
+          <div className="dialog-actions">
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={() => createDialog.current?.close()}
+            >
               Cancel
             </button>
-            <button type="submit" disabled={trimmedName.length === 0}>
+            <button className="primary-button" type="submit" disabled={trimmedName.length === 0}>
               Create
             </button>
           </div>
