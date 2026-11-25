@@ -49,6 +49,15 @@ body {
   margin: 0;
 }
 
+.inbox-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-wrap: anywhere;
+}
+
 .dashboard-main {
   padding: 32px;
 }
@@ -74,6 +83,31 @@ body {
   color: var(--button-text-color);
   font: inherit;
   font-weight: 600;
+}
+
+.inbox-table {
+  width: 100%;
+  margin-top: 28px;
+  border: 1px solid var(--divider-color);
+  border-radius: 10px;
+  border-spacing: 0;
+  background: var(--panel-background);
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.inbox-table th,
+.inbox-table td {
+  padding: 14px 20px;
+}
+
+.inbox-table thead {
+  color: var(--muted-text-color);
+}
+
+.inbox-table tbody th,
+.inbox-table tbody td {
+  border-top: 1px solid var(--divider-color);
 }
 
 .dashboard-empty {

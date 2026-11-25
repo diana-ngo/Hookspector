@@ -14,7 +14,7 @@ function App() {
       <div className="dashboard-layout">
         <aside className="inbox-sidebar" aria-label="Inboxes">
           {hasInboxes ? (
-            <ul>
+            <ul className="inbox-list" role="list">
               {inboxes.map((inbox) => (
                 <li key={inbox.id}>{inboxLabel(inbox)}</li>
               ))}
@@ -29,7 +29,7 @@ function App() {
             <button type="button">Create inbox</button>
           </header>
           {hasInboxes ? (
-            <table>
+            <table className="inbox-table">
               <thead>
                 <tr>
                   <th scope="col">Inbox</th>
