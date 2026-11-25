@@ -24,7 +24,28 @@ function App() {
             <h1>All inboxes</h1>
             <button type="button">Create inbox</button>
           </header>
-          <p className="dashboard-empty">No inboxes yet</p>
+          {hasInboxes ? (
+            <table>
+              <thead>
+                <tr>
+                  <th scope="col">Inbox</th>
+                  <th scope="col">Endpoint URL</th>
+                </tr>
+              </thead>
+              <tbody>
+                {inboxes.map((inbox) => (
+                  <tr key={inbox.id}>
+                    <th scope="row">{inbox.name}</th>
+                    <td>
+                      <code>{inbox.url}</code>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="dashboard-empty">No inboxes yet</p>
+          )}
         </main>
       </div>
     </>
