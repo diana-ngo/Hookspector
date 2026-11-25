@@ -58,9 +58,16 @@ function App() {
       </div>
       <dialog ref={createDialog} aria-labelledby="create-inbox-title">
         <h2 id="create-inbox-title">Create inbox</h2>
-        <button type="button" onClick={() => createDialog.current?.close()}>
-          Cancel
-        </button>
+        <form method="dialog">
+          <label htmlFor="inbox-name">Inbox name</label>
+          <input id="inbox-name" name="name" type="text" required maxLength={100} />
+          <div>
+            <button type="button" onClick={() => createDialog.current?.close()}>
+              Cancel
+            </button>
+            <button type="submit">Create</button>
+          </div>
+        </form>
       </dialog>
     </>
   );
