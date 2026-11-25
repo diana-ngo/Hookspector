@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, type SubmitEvent } from 'react';
 import { inboxes, type Inbox } from './sampleInboxes';
 import './App.css';
 
@@ -11,6 +11,22 @@ function App() {
   const [inboxName, setInboxName] = useState('');
   const trimmedName = inboxName.trim();
   const hasInboxes = inboxes.length > 0;
+
+  function openCreateDialog() {
+    const dialog = createDialog.current;
+    if (!dialog) return;
+
+    setInboxName('');
+    dialog.returnValue = '';
+    dialog.showModal();
+  }
+
+  function submitCreateInbox(event: SubmitEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (trimmedName.length === 0) return;
+
+    createDialog.current?.close(trimmedName);
+  }
 
   return (
     <>
@@ -30,7 +46,7 @@ function App() {
         <main className="dashboard-main">
           <header className="dashboard-header">
             <h1>All inboxes</h1>
-            <button type="button" onClick={() => createDialog.current?.showModal()}>
+            <button type="button" onClick={openCreateDialog}>
               Create inbox
             </button>
           </header>
@@ -60,7 +76,7 @@ function App() {
       </div>
       <dialog ref={createDialog} aria-labelledby="create-inbox-title">
         <h2 id="create-inbox-title">Create inbox</h2>
-        <form method="dialog">
+        <form method="dialog" onSubmit={submitCreateInbox}>
           <label htmlFor="inbox-name">Inbox name</label>
           <input
             id="inbox-name"
