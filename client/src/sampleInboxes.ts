@@ -1,18 +1,6 @@
-export type Inbox = {
-  id: string;
-  name: string | null;
-  url: string;
-};
+import type { Inbox } from './inboxApi';
+import mockData from './mock-data.json' with { type: 'json' };
 
-export const inboxes: Inbox[] = [
-  {
-    id: 'a3f927',
-    name: 'Inbox 1',
-    url: 'https://hookspector.example/capture/a3f927',
-  },
-  {
-    id: 'b61d40',
-    name: null,
-    url: 'https://hookspector.example/capture/b61d40',
-  },
-];
+export type { Inbox } from './inboxApi';
+
+export const inboxes: Inbox[] = mockData.bins;

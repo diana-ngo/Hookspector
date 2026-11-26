@@ -1,0 +1,16 @@
+{
+  "bins": [
+    {
+      "id": "a3f927",
+      "name": "Inbox 1",
+      "url": "https://hookspector.example/capture/a3f927",
+      "createdAt": "2026-11-23T22:00:00Z"
+    },
+    {
+      "id": "b61d40",
+      "name": null,
+      "url": "https://hookspector.example/capture/b61d40",
+      "createdAt": "2026-11-23T22:01:00Z"
+    }
+  ]
+}
