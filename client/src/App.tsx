@@ -1,16 +1,94 @@
-import { useRef, useState, type SubmitEvent } from 'react';
-import { inboxes, type Inbox } from './sampleInboxes';
+import { useEffect, useRef, useState, type SubmitEvent } from 'react';
+import type { Inbox } from './inboxApi';
+import { mockInboxApi } from './mockInboxApi';
 import './App.css';
+
+type InboxList =
+  { status: 'loading' } | { status: 'error' } | { status: 'ready'; inboxes: Inbox[] };
 
 function inboxLabel(inbox: Inbox) {
   return inbox.name ?? `Inbox ${inbox.id.slice(0, 6)}`;
 }
 
+function SidebarInboxList({ inboxList }: { inboxList: InboxList }) {
+  if (inboxList.status !== 'ready') return null;
+  if (inboxList.inboxes.length === 0) return <p>No inboxes yet</p>;
+
+  return (
+    <ul className="inbox-list" role="list">
+      {inboxList.inboxes.map((inbox) => (
+        <li key={inbox.id}>{inboxLabel(inbox)}</li>
+      ))}
+    </ul>
+  );
+}
+
+function DashboardInboxList({ inboxList, onRetry }: { inboxList: InboxList; onRetry: () => void }) {
+  if (inboxList.status === 'loading') {
+    return <p role="status">Loading inboxes…</p>;
+  }
+
+  if (inboxList.status === 'error') {
+    return (
+      <div>
+        <p role="alert">Could not load inboxes.</p>
+        <button className="secondary-button" type="button" onClick={onRetry}>
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  if (inboxList.inboxes.length === 0) {
+    return <p className="dashboard-empty">No inboxes yet</p>;
+  }
+
+  return (
+    <table className="inbox-table">
+      <thead>
+        <tr>
+          <th scope="col">Inbox</th>
+          <th scope="col">Endpoint URL</th>
+        </tr>
+      </thead>
+      <tbody>
+        {inboxList.inboxes.map((inbox) => (
+          <tr key={inbox.id}>
+            <th scope="row">{inboxLabel(inbox)}</th>
+            <td>
+              <code>{inbox.url}</code>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
 function App() {
   const createDialog = useRef<HTMLDialogElement>(null);
   const [inboxName, setInboxName] = useState('');
+  const [inboxList, setInboxList] = useState<InboxList>({ status: 'loading' });
   const trimmedName = inboxName.trim();
-  const hasInboxes = inboxes.length > 0;
+  const isLoading = inboxList.status === 'loading';
+
+  useEffect(() => {
+    if (!isLoading) return;
+
+    let ignore = false;
+    void mockInboxApi.listInboxes().then(
+      ({ data }) => {
+        if (!ignore) setInboxList({ status: 'ready', inboxes: data });
+      },
+      () => {
+        if (!ignore) setInboxList({ status: 'error' });
+      },
+    );
+
+    return () => {
+      ignore = true;
+    };
+  }, [isLoading]);
 
   function openCreateDialog() {
     const dialog = createDialog.current;
@@ -33,15 +111,7 @@ function App() {
       <header className="app-header">Hookspector</header>
       <div className="dashboard-layout">
         <aside className="inbox-sidebar" aria-label="Inboxes">
-          {hasInboxes ? (
-            <ul className="inbox-list" role="list">
-              {inboxes.map((inbox) => (
-                <li key={inbox.id}>{inboxLabel(inbox)}</li>
-              ))}
-            </ul>
-          ) : (
-            <p>No inboxes yet</p>
-          )}
+          <SidebarInboxList inboxList={inboxList} />
         </aside>
         <main className="dashboard-main">
           <header className="dashboard-header">
@@ -50,28 +120,10 @@ function App() {
               Create inbox
             </button>
           </header>
-          {hasInboxes ? (
-            <table className="inbox-table">
-              <thead>
-                <tr>
-                  <th scope="col">Inbox</th>
-                  <th scope="col">Endpoint URL</th>
-                </tr>
-              </thead>
-              <tbody>
-                {inboxes.map((inbox) => (
-                  <tr key={inbox.id}>
-                    <th scope="row">{inboxLabel(inbox)}</th>
-                    <td>
-                      <code>{inbox.url}</code>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          ) : (
-            <p className="dashboard-empty">No inboxes yet</p>
-          )}
+          <DashboardInboxList
+            inboxList={inboxList}
+            onRetry={() => setInboxList({ status: 'loading' })}
+          />
         </main>
       </div>
       <dialog
