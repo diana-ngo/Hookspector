@@ -97,6 +97,15 @@ body {
   font-weight: 700;
 }
 
+.inbox-back-link {
+  text-decoration: none;
+}
+
+.inbox-back-arrow {
+  display: inline-block;
+  margin-inline-end: 8px;
+}
+
 .inbox-endpoint {
   padding: 16px 20px;
   border: 1px solid var(--divider-color);

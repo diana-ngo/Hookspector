@@ -55,7 +55,12 @@ export default function InboxDetail() {
 
   return (
     <>
-      <Link to="/">All inboxes</Link>
+      <Link className="inbox-back-link" to="/">
+        <span className="inbox-back-arrow" aria-hidden="true">
+          ←
+        </span>
+        All inboxes
+      </Link>
       <h1>{inbox ? inboxLabel(inbox) : (error ?? 'Inbox not found')}</h1>
       {inbox && <InboxEndpoint key={inbox.url} url={inbox.url} />}
     </>
