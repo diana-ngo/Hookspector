@@ -1,13 +1,20 @@
 import { useEffect, useRef, useState, type SubmitEvent } from 'react';
+import { Link, NavLink, Outlet, useOutletContext } from 'react-router';
 import type { Inbox } from './inboxApi';
+import { inboxLabel } from './inboxLabel';
 import { mockInboxApi } from './mockInboxApi';
 import './App.css';
 
 type InboxList =
   { status: 'loading' } | { status: 'error' } | { status: 'ready'; inboxes: Inbox[] };
 
-function inboxLabel(inbox: Inbox) {
-  return inbox.name ?? `Inbox ${inbox.id.slice(0, 6)}`;
+type DashboardContext = {
+  inboxList: InboxList;
+  onRetry: () => void;
+};
+
+function inboxPath(id: string) {
+  return `/inboxes/${encodeURIComponent(id)}`;
 }
 
 function SidebarInboxList({ inboxList }: { inboxList: InboxList }) {
@@ -17,13 +24,15 @@ function SidebarInboxList({ inboxList }: { inboxList: InboxList }) {
   return (
     <ul className="inbox-list" role="list">
       {inboxList.inboxes.map((inbox) => (
-        <li key={inbox.id}>{inboxLabel(inbox)}</li>
+        <li key={inbox.id}>
+          <NavLink to={inboxPath(inbox.id)}>{inboxLabel(inbox)}</NavLink>
+        </li>
       ))}
     </ul>
   );
 }
 
-function DashboardInboxList({ inboxList, onRetry }: { inboxList: InboxList; onRetry: () => void }) {
+function DashboardInboxList({ inboxList, onRetry }: DashboardContext) {
   if (inboxList.status === 'loading') {
     return <p role="status">Loading inboxes…</p>;
   }
@@ -54,7 +63,9 @@ function DashboardInboxList({ inboxList, onRetry }: { inboxList: InboxList; onRe
       <tbody>
         {inboxList.inboxes.map((inbox) => (
           <tr key={inbox.id}>
-            <th scope="row">{inboxLabel(inbox)}</th>
+            <th scope="row">
+              <Link to={inboxPath(inbox.id)}>{inboxLabel(inbox)}</Link>
+            </th>
             <td>
               <code>{inbox.url}</code>
             </td>
@@ -66,10 +77,7 @@ function DashboardInboxList({ inboxList, onRetry }: { inboxList: InboxList; onRe
 }
 
 function App() {
-  const createDialog = useRef<HTMLDialogElement>(null);
-  const [inboxName, setInboxName] = useState('');
   const [inboxList, setInboxList] = useState<InboxList>({ status: 'loading' });
-  const trimmedName = inboxName.trim();
   const isLoading = inboxList.status === 'loading';
 
   useEffect(() => {
@@ -90,6 +98,32 @@ function App() {
     };
   }, [isLoading]);
 
+  const dashboardContext: DashboardContext = {
+    inboxList,
+    onRetry: () => setInboxList({ status: 'loading' }),
+  };
+
+  return (
+    <>
+      <header className="app-header">Hookspector</header>
+      <div className="dashboard-layout">
+        <aside className="inbox-sidebar" aria-label="Inboxes">
+          <SidebarInboxList inboxList={inboxList} />
+        </aside>
+        <main className="dashboard-main">
+          <Outlet context={dashboardContext} />
+        </main>
+      </div>
+    </>
+  );
+}
+
+export function Dashboard() {
+  const { inboxList, onRetry } = useOutletContext<DashboardContext>();
+  const createDialog = useRef<HTMLDialogElement>(null);
+  const [inboxName, setInboxName] = useState('');
+  const trimmedName = inboxName.trim();
+
   function openCreateDialog() {
     const dialog = createDialog.current;
     if (!dialog) return;
@@ -108,24 +142,13 @@ function App() {
 
   return (
     <>
-      <header className="app-header">Hookspector</header>
-      <div className="dashboard-layout">
-        <aside className="inbox-sidebar" aria-label="Inboxes">
-          <SidebarInboxList inboxList={inboxList} />
-        </aside>
-        <main className="dashboard-main">
-          <header className="dashboard-header">
-            <h1>All inboxes</h1>
-            <button className="primary-button" type="button" onClick={openCreateDialog}>
-              Create inbox
-            </button>
-          </header>
-          <DashboardInboxList
-            inboxList={inboxList}
-            onRetry={() => setInboxList({ status: 'loading' })}
-          />
-        </main>
-      </div>
+      <header className="dashboard-header">
+        <h1>All inboxes</h1>
+        <button className="primary-button" type="button" onClick={openCreateDialog}>
+          Create inbox
+        </button>
+      </header>
+      <DashboardInboxList inboxList={inboxList} onRetry={onRetry} />
       <dialog
         ref={createDialog}
         className="create-inbox-dialog"
