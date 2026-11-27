@@ -4,11 +4,25 @@ import { binExists, saveCapturedRequest } from '../store/captureStore.ts';
 
 const MAX_BODY_SIZE = '1mb';
 
-type CaptureParams = { id: string; rest?: string[] };
+type CaptureParams = { id: string };
+
+// One 404 for unknown Bins, wrong methods and extra segments alike.
+const notFound: RequestHandler = (_req, res) => {
+  res.status(404).json({ message: 'Not found' });
+};
+
+// Any '?' in the URL, even a bare one, counts as a query string.
+const rejectQuery: RequestHandler<CaptureParams> = (req, res, next) => {
+  if (req.originalUrl.includes('?')) {
+    res.status(400).json({ message: 'Query parameters are not supported' });
+    return;
+  }
+  next();
+};
 
 const requireBin: RequestHandler<CaptureParams> = async (req, res, next) => {
   if (!(await binExists(req.params.id))) {
-    res.status(404).json({ message: 'Bin not found' });
+    notFound(req, res, next);
     return;
   }
   next();
@@ -32,8 +46,6 @@ const capture: RequestHandler<CaptureParams> = async (req, res) => {
     const captured = await saveCapturedRequest({
       binId: req.params.id,
       method: req.method,
-      path: '/' + (req.params.rest ?? []).join('/'),
-      query: { ...req.query },
       headers: toHeaderPairs(req.rawHeaders),
       body,
       bodySize: body.length,
@@ -72,8 +84,11 @@ const captureErrors: ErrorRequestHandler = (err: unknown, _req, res, next) => {
 
 const captureRouter = express.Router();
 
-// Any method, optional sub-path: /capture/:id and /capture/:id/any/thing
-captureRouter.all('/capture/:id{/*rest}', requireBin, rawBody, capture);
+// Exactly POST /capture/:id (trailing slash allowed). Checks run cheapest
+// first: method/path, then query string, then Bin lookup, then body size.
+captureRouter.post('/capture/:id', rejectQuery, requireBin, rawBody, capture);
+// Anything else under /capture: wrong method, extra segments, bare /capture.
+captureRouter.all('/capture{/*rest}', notFound);
 captureRouter.use(captureErrors);
 
 export default captureRouter;

@@ -8,8 +8,6 @@ import { randomUUID } from 'node:crypto';
 export interface CapturedRequestInput {
   binId: string;
   method: string;
-  path: string;
-  query: Record<string, unknown>;
   headers: [name: string, value: string][];
   body: Buffer;
   bodySize: number;
