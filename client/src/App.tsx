@@ -124,6 +124,7 @@ export function Dashboard() {
   const createDialog = useRef<HTMLDialogElement>(null);
   const [inboxName, setInboxName] = useState('');
   const [isCreating, setIsCreating] = useState(false);
+  const [createError, setCreateError] = useState('');
   const trimmedName = inboxName.trim();
 
   function openCreateDialog() {
@@ -131,6 +132,7 @@ export function Dashboard() {
     if (!dialog) return;
 
     setInboxName('');
+    setCreateError('');
     dialog.showModal();
   }
 
@@ -139,16 +141,21 @@ export function Dashboard() {
     if (isCreating || trimmedName.length === 0) return;
 
     setIsCreating(true);
+    setCreateError('');
+    let id: string;
     try {
-      const { id } = await mockInboxApi.createInbox(trimmedName);
-      refreshInboxList();
-      createDialog.current?.close();
-      await navigate(inboxPath(id));
-    } catch (error) {
-      console.error('Could not complete inbox creation.', error);
+      const createdInbox = await mockInboxApi.createInbox(trimmedName);
+      id = createdInbox.id;
+    } catch {
+      setCreateError('Could not create the inbox. Try again.');
+      return;
     } finally {
       setIsCreating(false);
     }
+
+    refreshInboxList();
+    createDialog.current?.close();
+    void navigate(inboxPath(id));
   }
 
   return (
@@ -181,6 +188,11 @@ export function Dashboard() {
             value={inboxName}
             onChange={(event) => setInboxName(event.currentTarget.value)}
           />
+          {createError && (
+            <p className="create-inbox-error" role="alert">
+              {createError}
+            </p>
+          )}
           <div className="dialog-actions">
             <button
               className="secondary-button"
