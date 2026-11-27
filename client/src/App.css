@@ -215,6 +215,10 @@ body {
   border-top: 1px solid var(--divider-color);
 }
 
+.inbox-table tbody th a {
+  text-decoration: none;
+}
+
 .dashboard-empty {
   display: grid;
   place-items: center;
