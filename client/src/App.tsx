@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type SubmitEvent } from 'react';
-import { Link, NavLink, Outlet, useOutletContext } from 'react-router';
+import { Link, NavLink, Outlet, useNavigate, useOutletContext } from 'react-router';
 import type { Inbox } from './inboxApi';
 import { inboxLabel } from './inboxLabel';
 import { mockInboxApi } from './mockInboxApi';
@@ -10,7 +10,7 @@ type InboxList =
 
 type DashboardContext = {
   inboxList: InboxList;
-  onRetry: () => void;
+  refreshInboxList: () => void;
 };
 
 function inboxPath(id: string) {
@@ -32,7 +32,7 @@ function SidebarInboxList({ inboxList }: { inboxList: InboxList }) {
   );
 }
 
-function DashboardInboxList({ inboxList, onRetry }: DashboardContext) {
+function DashboardInboxList({ inboxList, refreshInboxList }: DashboardContext) {
   if (inboxList.status === 'loading') {
     return <p role="status">Loading inboxes…</p>;
   }
@@ -41,7 +41,7 @@ function DashboardInboxList({ inboxList, onRetry }: DashboardContext) {
     return (
       <div>
         <p role="alert">Could not load inboxes.</p>
-        <button className="secondary-button" type="button" onClick={onRetry}>
+        <button className="secondary-button" type="button" onClick={refreshInboxList}>
           Retry
         </button>
       </div>
@@ -78,11 +78,9 @@ function DashboardInboxList({ inboxList, onRetry }: DashboardContext) {
 
 function App() {
   const [inboxList, setInboxList] = useState<InboxList>({ status: 'loading' });
-  const isLoading = inboxList.status === 'loading';
+  const [loadAttempt, setLoadAttempt] = useState(0);
 
   useEffect(() => {
-    if (!isLoading) return;
-
     let ignore = false;
     void mockInboxApi.listInboxes().then(
       ({ data }) => {
@@ -96,12 +94,14 @@ function App() {
     return () => {
       ignore = true;
     };
-  }, [isLoading]);
+  }, [loadAttempt]);
 
-  const dashboardContext: DashboardContext = {
-    inboxList,
-    onRetry: () => setInboxList({ status: 'loading' }),
-  };
+  function refreshInboxList() {
+    setInboxList({ status: 'loading' });
+    setLoadAttempt((attempt) => attempt + 1);
+  }
+
+  const dashboardContext: DashboardContext = { inboxList, refreshInboxList };
 
   return (
     <>
@@ -119,9 +119,11 @@ function App() {
 }
 
 export function Dashboard() {
-  const { inboxList, onRetry } = useOutletContext<DashboardContext>();
+  const { inboxList, refreshInboxList } = useOutletContext<DashboardContext>();
+  const navigate = useNavigate();
   const createDialog = useRef<HTMLDialogElement>(null);
   const [inboxName, setInboxName] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
   const trimmedName = inboxName.trim();
 
   function openCreateDialog() {
@@ -129,15 +131,24 @@ export function Dashboard() {
     if (!dialog) return;
 
     setInboxName('');
-    dialog.returnValue = '';
     dialog.showModal();
   }
 
-  function submitCreateInbox(event: SubmitEvent<HTMLFormElement>) {
+  async function submitCreateInbox(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (trimmedName.length === 0) return;
+    if (isCreating || trimmedName.length === 0) return;
 
-    createDialog.current?.close(trimmedName);
+    setIsCreating(true);
+    try {
+      const { id } = await mockInboxApi.createInbox(trimmedName);
+      refreshInboxList();
+      createDialog.current?.close();
+      await navigate(inboxPath(id));
+    } catch (error) {
+      console.error('Could not complete inbox creation.', error);
+    } finally {
+      setIsCreating(false);
+    }
   }
 
   return (
@@ -148,14 +159,17 @@ export function Dashboard() {
           Create inbox
         </button>
       </header>
-      <DashboardInboxList inboxList={inboxList} onRetry={onRetry} />
+      <DashboardInboxList inboxList={inboxList} refreshInboxList={refreshInboxList} />
       <dialog
         ref={createDialog}
         className="create-inbox-dialog"
         aria-labelledby="create-inbox-title"
+        onCancel={(event) => {
+          if (isCreating) event.preventDefault();
+        }}
       >
         <h2 id="create-inbox-title">Create inbox</h2>
-        <form method="dialog" onSubmit={submitCreateInbox}>
+        <form method="dialog" onSubmit={(event) => void submitCreateInbox(event)}>
           <label htmlFor="inbox-name">Inbox name</label>
           <input
             id="inbox-name"
@@ -163,6 +177,7 @@ export function Dashboard() {
             type="text"
             required
             maxLength={100}
+            readOnly={isCreating}
             value={inboxName}
             onChange={(event) => setInboxName(event.currentTarget.value)}
           />
@@ -170,12 +185,17 @@ export function Dashboard() {
             <button
               className="secondary-button"
               type="button"
+              disabled={isCreating}
               onClick={() => createDialog.current?.close()}
             >
               Cancel
             </button>
-            <button className="primary-button" type="submit" disabled={trimmedName.length === 0}>
-              Create
+            <button
+              className="primary-button"
+              type="submit"
+              disabled={isCreating || trimmedName.length === 0}
+            >
+              {isCreating ? 'Creating…' : 'Create'}
             </button>
           </div>
         </form>
