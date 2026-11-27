@@ -107,8 +107,14 @@ function App() {
     <>
       <header className="app-header">Hookspector</header>
       <div className="dashboard-layout">
-        <aside className="inbox-sidebar" aria-label="Inboxes">
-          <SidebarInboxList inboxList={inboxList} />
+        <aside className="inbox-sidebar">
+          <nav aria-label="Inboxes">
+            <NavLink to="/" end>
+              All inboxes
+            </NavLink>
+            <hr />
+            <SidebarInboxList inboxList={inboxList} />
+          </nav>
         </aside>
         <main className="dashboard-main">
           <Outlet context={dashboardContext} />

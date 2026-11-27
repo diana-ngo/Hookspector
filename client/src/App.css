@@ -47,11 +47,18 @@ body {
 
 .inbox-sidebar p {
   margin: 0;
+  padding: 8px 12px;
+}
+
+.inbox-sidebar hr {
+  margin: 12px 0;
+  border: 0;
+  border-top: 1px solid var(--divider-color);
 }
 
 .inbox-list {
   display: grid;
-  gap: 12px;
+  gap: 4px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -62,12 +69,31 @@ body {
   padding: 32px;
 }
 
-.inbox-sidebar a,
 .dashboard-main a {
   color: var(--button-background);
 }
 
+.inbox-sidebar a {
+  display: block;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: inherit;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.inbox-sidebar a:hover {
+  background: var(--divider-color);
+}
+
+.inbox-sidebar a:focus-visible {
+  outline: 2px solid var(--button-background);
+  outline-offset: 2px;
+}
+
 .inbox-sidebar a[aria-current='page'] {
+  background: #252b41;
+  color: var(--button-background);
   font-weight: 700;
 }
 
