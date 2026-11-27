@@ -98,7 +98,37 @@ body {
 }
 
 .inbox-endpoint {
+  padding: 16px 20px;
+  border: 1px solid var(--divider-color);
+  border-radius: 10px;
+  background: var(--panel-background);
+}
+
+.inbox-endpoint h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+
+.inbox-endpoint-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+}
+
+.inbox-endpoint code {
+  display: grid;
+  align-content: center;
+  padding: 10px 14px;
+  border: 1px solid var(--divider-color);
+  border-radius: 8px;
+  background: var(--page-background);
+  font-size: 0.875rem;
   overflow-wrap: anywhere;
+}
+
+.inbox-endpoint .secondary-button {
+  background: #202532;
+  white-space: nowrap;
 }
 
 .dashboard-header {

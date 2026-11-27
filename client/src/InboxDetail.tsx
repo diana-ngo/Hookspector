@@ -10,9 +10,15 @@ export default function InboxDetail() {
       <Link to="/">All inboxes</Link>
       <h1>{inbox ? inboxLabel(inbox) : (error ?? 'Inbox not found')}</h1>
       {inbox && (
-        <p className="inbox-endpoint">
-          Endpoint URL <code>{inbox.url}</code>
-        </p>
+        <section className="inbox-endpoint" aria-labelledby="inbox-endpoint-title">
+          <h2 id="inbox-endpoint-title">Endpoint URL</h2>
+          <div className="inbox-endpoint-row">
+            <code>{inbox.url}</code>
+            <button className="secondary-button" type="button" disabled>
+              Copy URL
+            </button>
+          </div>
+        </section>
       )}
     </>
   );
