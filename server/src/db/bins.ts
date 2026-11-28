@@ -9,7 +9,7 @@ export type Bin = {
 export async function createBin(name: string): Promise<Bin> {
   const result = await pool.query<Bin>(
     `INSERT INTO bins (name)
-    VALUES ($1)
+    VALUES (TRIM($1))
     RETURNING id, name, created_at;`, [name]
   );
 

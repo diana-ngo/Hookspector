@@ -5,4 +5,4 @@ CREATE TABLE IF NOT EXISTS bins (
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS idx_bins_name_unique
-ON bins (LOWER(name));
+ON bins (LOWER(TRIM(name)));
