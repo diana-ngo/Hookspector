@@ -1,0 +1,8 @@
+CREATE TABLE IF NOT EXISTS bins (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL CHECK (LENGTH(TRIM(name)) >= 1),
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_bins_name_unique
+ON bins (LOWER(TRIM(name)));
